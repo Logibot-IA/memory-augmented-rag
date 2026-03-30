@@ -48,7 +48,7 @@ embeddings = HuggingFaceEmbeddings(
 vector_store = InMemoryVectorStore(embeddings)
 
 loader = DirectoryLoader(
-    path="docs",
+    path="../docs/",
     glob="**/*.pdf",
     loader_cls=PyPDFLoader
 )
