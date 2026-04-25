@@ -1,5 +1,6 @@
 import os
 import uuid
+from itertools import count
 import dotenv
 from typing import List, Dict, Any
 
@@ -176,25 +177,21 @@ def evaluate_with_ragas():
     
     return result
 
+def salvar(df, nome_base="memory-augmented-rag"):
+    os.makedirs("results", exist_ok=True)
+    for i in count(1):
+        nome = os.path.join("results", f"{nome_base}_{i}.csv")
+        if not os.path.exists(nome):
+            df.to_csv(nome, index=False, encoding="utf-8-sig", sep=";")
+            print(f"Salvo em: {nome}")
+            break
+
+
 if __name__ == "__main__":
-    thread_id = "sael"
-    query = (
-        "O que é array em programação lógica?\n\n"
-        "Depois que obtiver a resposta, pesquise extensões comuns desse método."
-    )
-    
-    print("=== EXECUÇÃO NORMAL DO AGENT ===")
-    for event in agent.stream(
-        {"messages": [{"role": "user", "content": query}]},
-        config={"configurable": {"thread_id": thread_id}},
-        stream_mode="values",
-    ):
-        event["messages"][-1].pretty_print()
-    
-    
-    print("\n\n=== AVALIAÇÃO RAGAS ===")
+    print("=== AVALIAÇÃO RAGAS ===")
     try:
-        evaluate_with_ragas()
+        result = evaluate_with_ragas()
+        salvar(result.to_pandas())
     except Exception as e:
         print(f"Erro na avaliação RAGAS: {e}")
         print("Verifique se tem OPENAI_API_KEY válido e ragas instalado.")
